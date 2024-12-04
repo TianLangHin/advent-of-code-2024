@@ -2,7 +2,7 @@ use regex::Regex;
 
 fn part1(grid: &Vec<Vec<char>>) {
     let xmas_regex = Regex::new("XMAS").unwrap();
-    let smax_regex = Regex::new("SAMX").unwrap();
+    let samx_regex = Regex::new("SAMX").unwrap();
 
     let rows = grid.len();
     let cols = grid[0].len();
@@ -12,14 +12,14 @@ fn part1(grid: &Vec<Vec<char>>) {
         .iter()
         .map(|line_chars| {
             let line: String = line_chars.into_iter().collect();
-            xmas_regex.captures_iter(&line).count() + smax_regex.captures_iter(&line).count()
+            xmas_regex.captures_iter(&line).count() + samx_regex.captures_iter(&line).count()
         })
         .sum::<usize>();
 
     let vertical_matches = (0..cols)
         .map(|index| {
             let line: String = (0..rows).map(|row| grid[row][index]).collect();
-            xmas_regex.captures_iter(&line).count() + smax_regex.captures_iter(&line).count()
+            xmas_regex.captures_iter(&line).count() + samx_regex.captures_iter(&line).count()
         })
         .sum::<usize>();
 
@@ -29,7 +29,7 @@ fn part1(grid: &Vec<Vec<char>>) {
                 .take_while(|i| i + index < rows && i + index < cols)
                 .map(|i| grid[i][i + index])
                 .collect();
-            xmas_regex.captures_iter(&line).count() + smax_regex.captures_iter(&line).count()
+            xmas_regex.captures_iter(&line).count() + samx_regex.captures_iter(&line).count()
         })
         .sum::<usize>();
 
@@ -39,7 +39,7 @@ fn part1(grid: &Vec<Vec<char>>) {
                 .take_while(|i| i + index < rows && i + index < cols)
                 .map(|i| grid[i + index][i])
                 .collect();
-            xmas_regex.captures_iter(&line).count() + smax_regex.captures_iter(&line).count()
+            xmas_regex.captures_iter(&line).count() + samx_regex.captures_iter(&line).count()
         })
         .sum::<usize>();
 
@@ -54,7 +54,7 @@ fn part1(grid: &Vec<Vec<char>>) {
                 .take_while(|i| i + index < rows && i + index < cols)
                 .map(|i| reversed_grid[i][i + index])
                 .collect();
-            xmas_regex.captures_iter(&line).count() + smax_regex.captures_iter(&line).count()
+            xmas_regex.captures_iter(&line).count() + samx_regex.captures_iter(&line).count()
         })
         .sum::<usize>();
 
@@ -64,7 +64,7 @@ fn part1(grid: &Vec<Vec<char>>) {
                 .take_while(|i| i + index < rows && i + index < cols)
                 .map(|i| reversed_grid[i + index][i])
                 .collect();
-            xmas_regex.captures_iter(&line).count() + smax_regex.captures_iter(&line).count()
+            xmas_regex.captures_iter(&line).count() + samx_regex.captures_iter(&line).count()
         })
         .sum::<usize>();
 
