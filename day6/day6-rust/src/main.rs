@@ -136,7 +136,6 @@ fn part1(
             visited.extend((pos.1 .. cols).map(|i| (pos.0, i)));
         }
         Direction::Down => {
-            // println!("{:?}", (pos.0 .. rows).map(|i| (i, pos.1)).collect::<Vec<_>>());
             visited.extend((pos.0 .. rows).map(|i| (i, pos.1)));
         }
         Direction::Left => {
