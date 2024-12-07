@@ -13,20 +13,19 @@ void part1(std::vector<std::pair<long_int, std::vector<long_int>>> equations) {
     for (auto pair : equations) {
         auto target = pair.first;
         auto nums = pair.second;
-        std::stack<std::pair<long_int, long_int>> frontier;
-        frontier.push({ nums[0], 1 });
-        while (!frontier.empty()) {
-            auto top_element = frontier.top();
-            frontier.pop();
+        std::vector<std::pair<long_int, int>> stack { {nums[0], 1} };
+        while (!stack.empty()) {
+            auto top_element = stack.back();
+            stack.pop_back();
             auto result = top_element.first;
             auto idx = top_element.second;
             if (result == target && idx == nums.size()) {
-                sum += result;
+                sum += target;
                 break;
             }
-            if (idx < nums.size()) {
-                frontier.push({ result + nums[idx], idx + 1 });
-                frontier.push({ result * nums[idx], idx + 1 });
+            if (result <= target && idx < nums.size()) {
+                stack.push_back({ result + nums[idx], idx + 1 });
+                stack.push_back({ result * nums[idx], idx + 1 });
             }
         }
     }
@@ -34,13 +33,12 @@ void part1(std::vector<std::pair<long_int, std::vector<long_int>>> equations) {
 }
 
 long_int concat(long_int a, long_int b) {
+    if (b == 0)
+        return 10 * a;
     int digits = 0, c = b;
     while (b) {
         b /= 10;
-        digits++;
-    }
-    while (digits--) {
-        a *= 10;
+        a *= 10; 
     }
     return a + c;
 }
@@ -61,7 +59,7 @@ void part2(std::vector<std::pair<long_int, std::vector<long_int>>> equations) {
                 sum += result;
                 break;
             }
-            if (idx < nums.size()) {
+            if (result <= target && idx < nums.size()) {
                 frontier.push({ result + nums[idx], idx + 1 });
                 frontier.push({ result * nums[idx], idx + 1 });
                 frontier.push({ concat(result, nums[idx]), idx + 1 });
