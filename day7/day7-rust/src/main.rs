@@ -1,10 +1,7 @@
 fn part1(equations: &Vec<(u64, Vec<u64>)>) {
     let mut sum = 0;
     for (target, nums) in equations {
-        let mut stack: Vec<(u64, usize)> = Vec::from([
-            (nums[0] + nums[1], 2),
-            (nums[0] * nums[1], 2)
-        ]);
+        let mut stack: Vec<(u64, usize)> = Vec::from([(nums[0], 1)]);
         while let Some((result, idx)) = stack.pop() {
             if result == *target && idx == nums.len() {
                 sum += *target;
@@ -28,11 +25,7 @@ fn concat(a: u64, b: u64) -> u64 {
 fn part2(equations: &Vec<(u64, Vec<u64>)>) {
     let mut sum = 0;
     for (target, nums) in equations {
-        let mut stack: Vec<(u64, usize)> = Vec::from([
-            (nums[0] + nums[1], 2),
-            (nums[0] * nums[1], 2),
-            (concat(nums[0], nums[1]), 2),
-        ]);
+        let mut stack: Vec<(u64, usize)> = Vec::from([(nums[0], 1)]);
         while let Some((result, idx)) = stack.pop() {
             if result == *target && idx == nums.len() {
                 sum += *target;
