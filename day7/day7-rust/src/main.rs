@@ -6,7 +6,7 @@ fn part1(equations: &Vec<(u64, Vec<u64>)>) {
             (nums[0] * nums[1], 2)
         ]);
         while let Some((result, idx)) = stack.pop() {
-            if result == *target {
+            if result == *target && idx == nums.len() {
                 sum += *target;
                 break;
             }
