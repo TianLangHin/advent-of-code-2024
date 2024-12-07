@@ -7,7 +7,7 @@ fn part1(equations: &Vec<(u64, Vec<u64>)>) {
                 sum += *target;
                 break;
             }
-            if idx >= nums.len() {
+            if result > *target || idx >= nums.len() {
                 continue;
             }
             stack.push((result + nums[idx], idx + 1));
@@ -31,7 +31,7 @@ fn part2(equations: &Vec<(u64, Vec<u64>)>) {
                 sum += *target;
                 break;
             }
-            if idx >= nums.len() {
+            if result > *target || idx >= nums.len() {
                 continue;
             }
             stack.push((concat(result, nums[idx]), idx + 1));
