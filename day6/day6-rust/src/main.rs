@@ -44,7 +44,7 @@ fn make_move<const TRACKING: bool>(
     match direction {
         Direction::Up => {
             if TRACKING {
-                visited.extend((obstacle + 1 ..= pos.0).map(|i| (i, pos.1)));
+                visited.extend((obstacle + 1 .. pos.0).map(|i| (i, pos.1)));
             }
             *pos = (obstacle + 1, pos.1);
         }
@@ -62,7 +62,7 @@ fn make_move<const TRACKING: bool>(
         }
         Direction::Left => {
             if TRACKING {
-                visited.extend((obstacle + 1 ..= pos.1).map(|i| (pos.0, i)));
+                visited.extend((obstacle + 1 .. pos.1).map(|i| (pos.0, i)));
             }
             *pos = (pos.0, obstacle + 1);
         }
