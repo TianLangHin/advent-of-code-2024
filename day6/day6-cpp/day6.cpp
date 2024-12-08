@@ -2,7 +2,6 @@
 #include<fstream>
 #include<iostream>
 #include<map>
-#include<optional>
 #include<set>
 #include<utility>
 #include<vector>
@@ -32,7 +31,7 @@ Direction next_direction(Direction d) {
     __builtin_unreachable();
 }
 
-obstacle_maps make_maps(std::vector<point> obstacles) {
+obstacle_maps make_maps(std::vector<point>& obstacles) {
     obstacle_map row_map, col_map;
     for (auto p : obstacles) {
         int row = p.first;
@@ -51,49 +50,58 @@ obstacle_maps make_maps(std::vector<point> obstacles) {
     return obstacle_maps(row_map, col_map);
 }
 
-template<bool TRACKING>
-void make_move(int obstacle, Direction direction, std::set<point>& visited, point *pos) {
+void make_move(int obstacle, Direction direction, std::set<point>& visited, point& pos) {
     switch (direction) {
         case UP:
-            if (TRACKING) {
-                for (int i = obstacle + 1; i < pos->first; ++i) {
-                    visited.insert(point(i, pos->second));
-                }
+            for (int i = obstacle + 1; i < pos.first; ++i) {
+                visited.insert(point(i, pos.second));
             }
-            *pos = point(obstacle + 1, pos->second);
+            pos = point(obstacle + 1, pos.second);
             break;
         case RIGHT:
-            if (TRACKING) {
-                for (int i = pos->second; i < obstacle; ++i) {
-                    visited.insert(point(pos->first, i));
-                }
+            for (int i = pos.second; i < obstacle; ++i) {
+                visited.insert(point(pos.first, i));
             }
-            *pos = point(pos->first, obstacle - 1);
+            pos = point(pos.first, obstacle - 1);
             break;
         case DOWN:
-            if (TRACKING) {
-                for (int i = pos->first; i < obstacle; ++i) {
-                    visited.insert(point(i, pos->second));
-                }
+            for (int i = pos.first; i < obstacle; ++i) {
+                visited.insert(point(i, pos.second));
             }
-            *pos = point(obstacle - 1, pos->second);
+            pos = point(obstacle - 1, pos.second);
             break;
         case LEFT:
-            if (TRACKING) {
-                for (int i = obstacle + 1; i < pos->second; ++i) {
-                    visited.insert(point(pos->first, i));
-                }
+            for (int i = obstacle + 1; i < pos.second; ++i) {
+                visited.insert(point(pos.first, i));
             }
-            *pos = point(pos->first, obstacle + 1);
+            pos = point(pos.first, obstacle + 1);
             break;
     }
 }
 
-std::optional<int> get_next_obstacle(
+point next_pos(int obstacle, Direction direction, point pos) {
+    switch (direction) {
+        case UP:
+            pos = point(obstacle + 1, pos.second);
+            break;
+        case RIGHT:
+            pos = point(pos.first, obstacle - 1);
+            break;
+        case DOWN:
+            pos = point(obstacle - 1, pos.second);
+            break;
+        case LEFT:
+            pos = point(pos.first, obstacle + 1);
+            break;
+    }
+    return pos;
+}
+
+int get_next_obstacle(
     Direction direction,
     point pos,
-    obstacle_map row_map,
-    obstacle_map col_map) {
+    obstacle_map& row_map,
+    obstacle_map& col_map) {
 
     switch (direction) {
         case UP:
@@ -106,11 +114,9 @@ std::optional<int> get_next_obstacle(
                         return target > coordinate;
                     }
                 );
-                return obstacle != col_map[pos.second].rend() ?
-                    std::optional<int> { *obstacle } :
-                    std::nullopt;
+                return obstacle != col_map[pos.second].rend() ? *obstacle : -1;
             } else {
-                return std::nullopt;
+                return -1;
             }
         case RIGHT:
             if (row_map.count(pos.first)) {
@@ -122,11 +128,9 @@ std::optional<int> get_next_obstacle(
                         return target < coordinate;
                     }
                 );
-                return obstacle != row_map[pos.first].end() ?
-                    std::optional<int> { *obstacle } :
-                    std::nullopt;
+                return obstacle != row_map[pos.first].end() ? *obstacle : -1;
             } else {
-                return std::nullopt;
+                return -1;
             }
         case DOWN:
             if (col_map.count(pos.second)) {
@@ -138,11 +142,9 @@ std::optional<int> get_next_obstacle(
                         return target < coordinate;
                     }
                 );
-                return obstacle != col_map[pos.second].end() ?
-                    std::optional<int> { *obstacle } :
-                    std::nullopt;
+                return obstacle != col_map[pos.second].end() ? *obstacle : -1;
             } else {
-                return std::nullopt;
+                return -1;
             }
         case LEFT:
             if (row_map.count(pos.first)) {
@@ -154,17 +156,15 @@ std::optional<int> get_next_obstacle(
                         return target > coordinate;
                     }
                 );
-                return obstacle != row_map[pos.first].rend() ?
-                    std::optional<int> { *obstacle } :
-                    std::nullopt;
+                return obstacle != row_map[pos.first].rend() ? *obstacle : -1;
             } else {
-                return std::nullopt;
+                return -1;
             }
     }
     __builtin_unreachable();
 }
 
-std::set<point> part1(std::vector<point> obstacles, point start, int rows, int cols) {
+std::set<point> part1(std::vector<point>& obstacles, point start, int rows, int cols) {
     auto maps = make_maps(obstacles);
     auto row_map = maps.first;
     auto col_map = maps.second;
@@ -173,10 +173,10 @@ std::set<point> part1(std::vector<point> obstacles, point start, int rows, int c
     std::set<point> visited { start };
     Direction direction = UP;
 
-    std::optional<int> next_obstacle = get_next_obstacle(direction, pos, row_map, col_map);
+    int next_obstacle = get_next_obstacle(direction, pos, row_map, col_map);
 
-    while (next_obstacle.has_value()) {
-        make_move<true>(next_obstacle.value(), direction, visited, &pos);
+    while (next_obstacle != -1) {
+        make_move(next_obstacle, direction, visited, pos);
         direction = next_direction(direction);
         next_obstacle = get_next_obstacle(direction, pos, row_map, col_map);
     }
@@ -208,9 +208,9 @@ std::set<point> part1(std::vector<point> obstacles, point start, int rows, int c
 }
 
 void part2(
-    std::vector<point> obstacles,
+    std::vector<point>& obstacles,
     point start,
-    std::set<point> possible_placements) {
+    std::set<point>& possible_placements) {
 
     int sum = 0;
 
@@ -219,6 +219,8 @@ void part2(
     auto maps = make_maps(obstacles);
     auto row_map = maps.first;
     auto col_map = maps.second;
+
+    std::set<std::pair<point, Direction>> orientations;
 
     for (auto p : possible_placements) {
         int x = p.first;
@@ -240,21 +242,22 @@ void part2(
 
         point pos = start;
         Direction direction = UP;
-        std::set<std::pair<point, Direction>> orientations { { start, UP } };
+        orientations.clear();
+        orientations.insert({ start, UP });
 
-        std::optional<int> next_obstacle = get_next_obstacle(direction, pos, row_map, col_map);
+        int next_obstacle = get_next_obstacle(direction, pos, row_map, col_map);
 
-        while (next_obstacle.has_value()) {
-            make_move<false>(next_obstacle.value(), direction, visited, &pos);
+        while (next_obstacle != -1) {
+            pos = next_pos(next_obstacle, direction, pos);
             direction = next_direction(direction);
-            if (orientations.count({ pos, direction })) {
+            std::pair<point, Direction> pair = { pos, direction };
+            if (orientations.count(pair)) {
                 overlapped = true;
                 break;
             }
-            orientations.insert({ pos, direction });
             next_obstacle = get_next_obstacle(direction, pos, row_map, col_map);
+            orientations.insert(pair);
         }
-
         if (overlapped) {
             sum++;
         }
