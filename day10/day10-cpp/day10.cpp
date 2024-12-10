@@ -45,7 +45,7 @@ void part1(const std::vector<std::vector<int>>& landscape) {
     std::cout << answer << "\n";
 }
 
-void part2(std::vector<std::vector<int>>& landscape) {
+void part2(const std::vector<std::vector<int>>& landscape) {
     std::vector<std::vector<int>> reachable;
     for (const auto& row : landscape) {
         std::vector<int> reachable_row;
