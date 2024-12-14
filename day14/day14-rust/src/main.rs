@@ -35,6 +35,46 @@ fn part1(robots: &Vec<((i64, i64), (i64, i64))>) {
     println!("{answer}");
 }
 
+fn part2(mut robots: Vec<((i64, i64), (i64, i64))>) {
+    let width = 101;
+    let height = 103;
+
+    for seconds in 1..width * height {
+        let mut grid = [[false; 101]; 103];
+        for robot in robots.iter_mut() {
+            let ((px, py), (vx, vy)) = robot;
+            *robot = (((*px + *vx) % width, (*py + *vy) % height), (*vx, *vy));
+            if robot.0.0 < 0 {
+                robot.0.0 += width;
+            }
+            if robot.0.1 < 0 {
+                robot.0.1 += height;
+            }
+            grid[robot.0.1 as usize][robot.0.0 as usize] = true;
+        }
+        for row in grid {
+            let mut exit = false;
+            let mut run = 0;
+            for cell in row {
+                if cell {
+                    run += 1;
+                } else {
+                    run = 0;
+                }
+                // This value of `width / 4` is estimated based on trial-and-error.
+                if run > width / 4 {
+                    println!("{seconds}");
+                    exit = true;
+                    break;
+                }
+            }
+            if exit {
+                break;
+            }
+        }
+    }
+}
+
 fn main() {
     let robots: Vec<((i64, i64), (i64, i64))> = std::fs::read_to_string("day-14-puzzle-input.txt")
         .unwrap()
@@ -50,4 +90,5 @@ fn main() {
         })
         .collect();
     part1(&robots);
+    part2(robots.clone());
 }
