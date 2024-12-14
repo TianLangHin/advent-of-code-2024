@@ -13,13 +13,13 @@ fn part1(robots: &Vec<((i64, i64), (i64, i64))>) {
         let result_y = ((py % height) + 100 * (vy % height)) % height;
         let result_y = if result_y < 0 { result_y + height } else { result_y };
 
-        let quadrant_x = match result_x.cmp(&((width) / 2)) {
+        let quadrant_x = match result_x.cmp(&(width / 2)) {
             Ordering::Equal => None,
             Ordering::Less => Some(0),
             Ordering::Greater => Some(2),
         };
 
-        let quadrant_y = match result_y.cmp(&((height) / 2)) {
+        let quadrant_y = match result_y.cmp(&(height / 2)) {
             Ordering::Equal => None,
             Ordering::Less => Some(0),
             Ordering::Greater => Some(1),
