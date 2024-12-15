@@ -90,82 +90,59 @@ fn part2(mut robot: Point, walls: &Points, boxes: &Points, steps: &Vec<Direction
     robot = (robot.0 * 2, robot.1);
     for step in steps {
         match step {
-            Direction::Left => {
+            Direction::Left | Direction::Right => {
+                let inc = if *step == Direction::Left { -1 } else { 0 };
+                let skip = if *step == Direction::Left { -1 } else { 1 };
                 let (mut x, y) = robot;
-                x -= 1;
+                x += skip;
                 let mut found_boxes: Vec<Point> = Vec::new();
                 let mut wall_hit = walls.contains(&(x, y));
-                let mut box_hit = boxes.contains(&(x-1, y));
+                let mut box_hit = boxes.contains(&(x + inc, y));
                 while wall_hit || box_hit {
                     if wall_hit {
                         break;
                     } else if box_hit {
-                        found_boxes.push((x-1, y));
-                        x -= 2;
+                        found_boxes.push((x + inc, y));
+                        x += 2 * skip;
                     }
                     wall_hit = walls.contains(&(x, y));
-                    box_hit = boxes.contains(&(x-1, y));
+                    box_hit = boxes.contains(&(x + inc, y));
                 }
                 if !wall_hit {
                     for b in &found_boxes {
                         boxes.remove(b);
                     }
                     for &b in &found_boxes {
-                        boxes.insert((b.0 - 1, b.1));
+                        boxes.insert((b.0 + skip, b.1));
                     }
-                    robot = (robot.0 - 1, robot.1);
+                    robot = (robot.0 + skip, robot.1);
                 }
             }
-            Direction::Right => {
-                let (mut x, y) = robot;
-                x += 1;
-                let mut found_boxes: Vec<Point> = Vec::new();
-                let mut wall_hit = walls.contains(&(x, y));
-                let mut box_hit = boxes.contains(&(x, y));
-                while wall_hit || box_hit {
-                    if wall_hit {
-                        break;
-                    } else if box_hit {
-                        found_boxes.push((x, y));
-                        x += 2;
-                    }
-                    wall_hit = walls.contains(&(x, y));
-                    box_hit = boxes.contains(&(x, y));
-                }
-                if !wall_hit {
-                    for b in &found_boxes {
-                        boxes.remove(b);
-                    }
-                    for &b in &found_boxes {
-                        boxes.insert((b.0 + 1, b.1));
-                    }
-                    robot = (robot.0 + 1, robot.1);
-                }
-            }
-            Direction::Up => {
+            Direction::Up | Direction::Down => {
+                let inc = if *step == Direction::Up { -1 } else { 1 };
                 let mut visited: Vec<Point> = Vec::new();
                 let mut frontier: VecDeque<Point> = VecDeque::new();
-                if walls.contains(&(robot.0, robot.1 - 1)) {
+                if walls.contains(&(robot.0, robot.1 + inc)) {
                     continue;
                 }
-                if boxes.contains(&(robot.0, robot.1 - 1)) {
-                    visited.push((robot.0, robot.1 - 1));
-                    frontier.push_back((robot.0, robot.1 - 1));
+                if boxes.contains(&(robot.0, robot.1 + inc)) {
+                    visited.push((robot.0, robot.1 + inc));
+                    frontier.push_back((robot.0, robot.1 + inc));
                 }
-                if boxes.contains(&(robot.0 - 1, robot.1 - 1)) {
-                    visited.push((robot.0 - 1, robot.1 - 1));
-                    frontier.push_back((robot.0 - 1, robot.1 - 1));
+                if boxes.contains(&(robot.0 - 1, robot.1 + inc)) {
+                    visited.push((robot.0 - 1, robot.1 + inc));
+                    frontier.push_back((robot.0 - 1, robot.1 + inc));
                 }
                 let mut wall_hit = false;
                 while let Some(b) = frontier.pop_front() {
-                    if walls.contains(&(b.0, b.1 - 1)) || walls.contains(&(b.0 + 1, b.1 - 1)) {
+                    if walls.contains(&(b.0, b.1 + inc)) || walls.contains(&(b.0 + 1, b.1 + inc)) {
                         wall_hit = true;
                         break;
                     }
                     for x_value in b.0 - 1 ..= b.0 + 1 {
-                        if boxes.contains(&(x_value, b.1 - 1)) {
-                            visited.push((x_value, b.1 - 1));
-                            frontier.push_back((x_value, b.1 - 1));
+                        if boxes.contains(&(x_value, b.1 + inc)) {
+                            visited.push((x_value, b.1 + inc));
+                            frontier.push_back((x_value, b.1 + inc));
                         }
                     }
                 }
@@ -174,46 +151,9 @@ fn part2(mut robot: Point, walls: &Points, boxes: &Points, steps: &Vec<Direction
                         boxes.remove(point);
                     }
                     for &point in &visited {
-                        boxes.insert((point.0, point.1 - 1));
+                        boxes.insert((point.0, point.1 + inc));
                     }
-                    robot = (robot.0, robot.1 - 1);
-                }
-            }
-            Direction::Down => {
-                let mut visited: Vec<Point> = Vec::new();
-                let mut frontier: VecDeque<Point> = VecDeque::new();
-                if walls.contains(&(robot.0, robot.1 + 1)) {
-                    continue;
-                }
-                if boxes.contains(&(robot.0, robot.1 + 1)) {
-                    visited.push((robot.0, robot.1 + 1));
-                    frontier.push_back((robot.0, robot.1 + 1));
-                }
-                if boxes.contains(&(robot.0 - 1, robot.1 + 1)) {
-                    visited.push((robot.0 - 1, robot.1 + 1));
-                    frontier.push_back((robot.0 - 1, robot.1 + 1));
-                }
-                let mut wall_hit = false;
-                while let Some(b) = frontier.pop_front() {
-                    if walls.contains(&(b.0, b.1 + 1)) || walls.contains(&(b.0 + 1, b.1 + 1)) {
-                        wall_hit = true;
-                        break;
-                    }
-                    for x_value in b.0 - 1 ..= b.0 + 1 {
-                        if boxes.contains(&(x_value, b.1 + 1)) {
-                            visited.push((x_value, b.1 + 1));
-                            frontier.push_back((x_value, b.1 + 1));
-                        }
-                    }
-                }
-                if !wall_hit {
-                    for point in &visited {
-                        boxes.remove(point);
-                    }
-                    for &point in &visited {
-                        boxes.insert((point.0, point.1 + 1));
-                    }
-                    robot = (robot.0, robot.1 + 1);
+                    robot = (robot.0, robot.1 + inc);
                 }
             }
         }
@@ -262,10 +202,6 @@ fn main() {
                 }
             }
         });
-    // println!("{walls:?}");
-    // println!("{boxes:?}");
-    // println!("{steps:?}");
-    // println!("{robot:?}");
     part1(robot, &walls, &boxes, &steps);
     part2(robot, &walls, &boxes, &steps);
 }
