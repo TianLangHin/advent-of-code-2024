@@ -12,7 +12,7 @@ fn part1(towels: &Vec<String>, designs: &Vec<String>) {
                             .iter()
                             .zip(towel.chars())
                             .all(|(&d, t)| d == t);
-                        let previous_solutions = start_index == 0 || solvable[start_index];
+                        let previous_solutions = start_index == 0 || solvable[start_index - 1];
                         if matches_suffix && previous_solutions {
                             solvable[i] = true;
                             break;
