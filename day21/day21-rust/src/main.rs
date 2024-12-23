@@ -87,10 +87,10 @@ fn part1(codes: &Vec<&str>) {
                     let y_path = (0..y_dist).map(|_| y_key).collect::<String>();
 
                     let mut paths = BTreeSet::new();
-                    if base_keypad.values().any(|&p| p == (x_end, y_start)) {
+                    if dir_keypad.values().any(|&p| p == (x_end, y_start)) {
                         paths.insert(x_path.clone() + &y_path);
                     }
-                    if base_keypad.values().any(|&p| p == (x_start, y_end)) {
+                    if dir_keypad.values().any(|&p| p == (x_start, y_end)) {
                         paths.insert(y_path.clone() + &x_path);
                     }
 
